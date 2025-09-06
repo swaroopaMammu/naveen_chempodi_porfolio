@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:portfolio_website/repository/cinema_repo.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:video_player/video_player.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
+import 'custom_widgets/associate_widget.dart';
+import 'custom_widgets/bio_widget.dart';
+import 'custom_widgets/feature_widget.dart';
+import 'custom_widgets/home_widget.dart';
+import 'custom_widgets/video_player_widget.dart';
 import 'models/cinematograpghy_modals.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,50 +19,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool _isMenuOpen = false;
-  String _selectedPage = "ShowReel";
+  String _selectedPage = "Showreel";
  late CinemaRepository repo;
-
-  late YoutubePlayerController mainController;
-  late List<VideoPlayerController> _controllers;
 
   @override
   void initState() {
     super.initState();
     repo = CinemaRepository();
-
-    mainController = YoutubePlayerController.fromVideoId(
-      videoId: "GkAUsuGMqm8",
-      autoPlay: false,
-      params: const YoutubePlayerParams(showFullscreenButton: true),
-    );
-
-    final videos = [
-     "assets/images/football.mp4",
-    "assets/images/video1.mp4",
-    "assets/images/video2.mp4",
-    "assets/images/video3.mp4",
-    "assets/images/video4.mp4",
-    "assets/images/video5.mp4",
-    ];
-    _controllers = videos.map((path) {
-      final controller =  VideoPlayerController.asset(path)
-        ..initialize().then((_) {
-          setState(() {});
-        });
-      controller.setLooping(true);
-      return controller;
-    }).toList();
-
   }
-
-  @override
-  void dispose() {
-    for( var controller in _controllers){
-      controller.dispose();
-    }
-    super.dispose();
-  }
-
 
   void _toggleMenu() {
     setState(() {
@@ -73,6 +41,87 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Widget _buildCustomHeader() {
+    final menuItems = ["Showreel", "Featured Work", "Associated Work", "Bio"];
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool isMobile = constraints.maxWidth < 600;
+
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          color: Colors.transparent,
+          child: Row(
+            children: [
+              // 🔹 Name Column on the left
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedPage = "Showreel";
+                  });
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      "Naveen Chempodi",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    Text(
+                      "Cinematographer",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              if (!isMobile)
+                Row(
+                  children: menuItems.map((item) {
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 24.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedPage = item;
+                          });
+                        },
+                        child: Text(
+                          item,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: _selectedPage == item ? FontWeight.bold : FontWeight.w400,
+                            color: _selectedPage == item ? Colors.black : Colors.grey[700],
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                )
+              else
+                IconButton(
+                  icon: Icon(
+                    _isMenuOpen ? Icons.close : Icons.menu,
+                    size: 28,
+                    color: Colors.black,
+                  ),
+                  onPressed: _toggleMenu,
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,8 +136,8 @@ class _HomePageState extends State<HomePage> {
             child: _buildMainContent(),
           ),
           // Footer
-          if(_selectedPage != "ShowReel")
-          _buildFooter(),
+          if(_selectedPage != "Showreel")
+            _buildFooter(),
         ],
       ),
     );
@@ -98,180 +147,33 @@ class _HomePageState extends State<HomePage> {
     if (_isMenuOpen) {
       return _buildMenuOverlay();
     }
-
     switch (_selectedPage) {
-      case "ShowReel":
-        return _buildHomeContent();
-      case "Bio | Contact":
-        return _buildBioSection();
+      case "Showreel":
+        return HomeContentGrid(footer:  _buildFooter());
+      case "Bio":
+        return BioSection();
       case "Featured Work":
-        return _buildFeaturedWork();
-      // case "Gallery":
-      //   return _buildPhotosSection(context);
-      case "Associated Work":
-        return _buildCinematography();
-      case "Feature Films":{
-        final  List<Trailer> filmImages = repo.getFilms();
-        return _buildVideoSection(filmImages);
-      }
-      case "Short Films":{
-        final  List<Trailer> shortFilms = repo.getShortFilms();
-        return _buildVideoSection(shortFilms);
-      }
-      case "Musicals":{
-        final  List<Trailer> musicals = repo.getMusicals();
-        return _buildVideoSection(musicals);
-      }
-      case "Web Series" :{
-        final  List<Trailer> webSeries = repo.getWebSeries();
-        return _buildVideoSection(webSeries);
-      }
-      // case "Narratives" :{
-      //   final  List<Trailer> narratives = repo.getNarratives();
-      //   return _buildVideoSection(narratives);
-      // }
-      case "Commercials":
         {
-          final  List<Trailer> commercials = repo.getCommercials();
-          return _buildVideoSection(commercials);
+          final  List<Trailer> works = repo.getFeatureWork();
+          return FeaturedWorkGrid(
+            films: works,
+            onTrailerTap: (film) {
+              _showFeaturedVideoModal(
+                context,
+                film: film,
+              );
+            },
+          );
         }
+      case "Associated Work":
+          return AssoWorkSection(
+      onCategoryChanged: (trailerId) {
+        _showYoutubeModal(context, trailerId);
+      },
+    );
       default:
         return _buildPlaceholderPage(_selectedPage);
     }
-  }
-
-  /// HEADER
-  Widget _buildCustomHeader() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: Colors.transparent,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          GestureDetector(
-            onTap: (){
-              setState(() {
-                _selectedPage = "ShowReel";
-              });
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  "Naveen Chempodi",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-                Text(
-                  "Cinematographer",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.grey,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            icon: Icon(
-              _isMenuOpen ? Icons.close : Icons.menu,
-              size: 28,
-              color: Colors.black,
-            ),
-            onPressed: _toggleMenu,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHomeContent() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        double maxWidth = constraints.maxWidth;
-
-        return ListView(
-          shrinkWrap: true,
-          children: [
-            const SizedBox(height: 20),
-            const Center(
-              child: Text(
-                "Cinematography Showreel",
-                style: TextStyle(
-                  fontSize: 34,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.all(40),
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: maxWidth < 600 ? 1 : 2, // 1 on small screens, 2 on larger
-                  crossAxisSpacing: 40,  // 🔹 more even horizontal gap
-                  mainAxisSpacing: 40,   // 🔹 more even vertical gap
-                  childAspectRatio: 16 / 9, // 🔹 classic video shape
-                ),
-                itemCount: _controllers.length,
-                itemBuilder: (context, index) {
-                  final controller = _controllers[index];
-
-                  return controller.value.isInitialized
-                      ? Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      ClipRRect(
-                        child: SizedBox.expand( // 🔹 force to fill grid cell
-                          child: FittedBox(
-                            fit: BoxFit.cover, // fill while keeping proportions
-                            child: SizedBox(
-                              width: controller.value.size.width,
-                              height: controller.value.size.height,
-                              child: VideoPlayer(controller),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // 🔹 Play / Pause Button
-                      IconButton(
-                        iconSize: 48,
-                        color: Colors.white,
-                        icon: Icon(
-                          controller.value.isPlaying
-                              ? Icons.pause_circle_filled
-                              : Icons.play_circle_fill,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            controller.value.isPlaying
-                                ? controller.pause()
-                                : controller.play();
-                          });
-                        },
-                      ),
-                    ],
-                  )
-                      : const Center(child: CircularProgressIndicator());
-                },
-              ),
-            ),
-
-            const SizedBox(height: 40),
-            _buildFooter(),
-            const SizedBox(height: 20),
-          ],
-        );
-      },
-    );
   }
 
   Widget _buildMenuOverlay() {
@@ -281,10 +183,10 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _menuItem("ShowReel"),
+          _menuItem("Showreel"),
           _menuItem("Featured Work"),
           _menuItem("Associated Work"),
-          _menuItem("Bio | Contact"),
+          _menuItem("Bio"),
           const SizedBox(height: 40),
         ],
       ),
@@ -309,666 +211,228 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildFeaturedWork() {
-    int selectedCategory = 0;
+  void _showYoutubeModal(BuildContext context, String videoId) {
+    final YoutubePlayerController controller = YoutubePlayerController.fromVideoId(
+      videoId: videoId,
+      autoPlay: true,
+      params: const YoutubePlayerParams(
+        showFullscreenButton: true,
+      ),
+    );
 
-    final List<String> titles = [
-      "Short Films",
-      "Web Series",
-      "Musicals",
-      "Commercials",
-    ];
-    return StatefulBuilder(
-      builder: (context, setState) {
-        _selectedPage = titles[selectedCategory];
-
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            bool isWide = constraints.maxWidth > 900;
-            double horizontalPadding = isWide ? 200 : 20;
-
-            return SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(horizontalPadding, 40, horizontalPadding, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 8,
-                    children: List.generate(titles.length, (index) {
-                      final isSelected = selectedCategory == index;
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedCategory = index;
-                            _selectedPage = titles[selectedCategory];
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isSelected ? Colors.blue : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            titles[index],
-                            style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text("TRAILERS", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-                  const SizedBox(height: 20),
-                  _buildMainContent()
-                ],
-              ),
-            );
-          },
-        );
-      },
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black54, // semi-transparent background
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(30),
+        child: Center(
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: YoutubePlayer(controller: controller),
+          ),
+        ),
+      ),
     );
   }
 
-  Widget _buildCinematography() {
-    int selectedCategory = 0;
-
-    final List<String> titles = [
-      "Feature Films",
-      "Web Series",
-      "Musicals",
-      "Commercials",
-    ];
-    return StatefulBuilder(
-      builder: (context, setState) {
-        _selectedPage = titles[selectedCategory];
-
-        return LayoutBuilder(
+  void _showFeaturedVideoModal(BuildContext context, {required Trailer film}) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black54,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(20),
+        child: LayoutBuilder(
           builder: (context, constraints) {
-            bool isWide = constraints.maxWidth > 900;
-            double horizontalPadding = isWide ? 200 : 20;
+            double maxWidth = constraints.maxWidth * 0.9;
+            double maxHeight = constraints.maxHeight * 0.9;
+            bool isSmallScreen = constraints.maxWidth < 600;
 
-            return SingleChildScrollView(
-              padding: EdgeInsets.fromLTRB(horizontalPadding, 40, horizontalPadding, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            return Center(
+              child: Stack(
                 children: [
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 8,
-                    children: List.generate(titles.length, (index) {
-                      final isSelected = selectedCategory == index;
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedCategory = index;
-                            _selectedPage = titles[selectedCategory];
-                          });
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: isSelected ? Colors.blue : Colors.grey[200],
-                            borderRadius: BorderRadius.circular(20),
+                  // 🔹 Main Content
+                  Container(
+                    width: maxWidth,
+                    height: maxHeight,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 30),
+                          isSmallScreen
+                              ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${film.filmName} (${film.yearOfRelease})",
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              _buildFilmDetails(context,film),
+                            ],
+                          )
+                              : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  "${film.filmName} (${film.yearOfRelease})",
+                                  style: const TextStyle(
+                                    fontSize: 28,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              Expanded(
+                                flex: 3,
+                                child: _buildFilmDetails(context,film),
+                              ),
+                            ],
                           ),
-                          child: Text(
-                            titles[index],
-                            style: TextStyle(
-                              color: isSelected ? Colors.white : Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          const SizedBox(height: 30),
+                          Column(
+                            children: film.videoPaths.map((assetPath) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 40),
+                                child: VideoPlayerWidget(assetPath: assetPath),
+                              );
+                            }).toList(),
                           ),
-                        ),
-                      );
-                    }),
-                  ),
-                  const SizedBox(height: 24),
-                  const Text("TRAILERS", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),
-                  const SizedBox(height: 20),
-                  _buildMainContent()
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildVideoSection(List<Trailer> filmImages) {
-    int selectedId = 0;
-    return StatefulBuilder(
-      builder: (context, setState) {
-        List<String> images = filmImages.isNotEmpty
-            ? (filmImages[selectedId].photoPaths ?? [])
-            : [];
-
-        if (filmImages.isNotEmpty) {
-        setState((){
-          mainController.loadVideoById(videoId: filmImages[selectedId].trailerId);
-        });
-        }
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: filmImages.length,
-                itemBuilder: (context, index) {
-                  final videoId = filmImages[index].trailerId;
-                  final thumbnailUrl =
-                      "https://img.youtube.com/vi/$videoId/0.jpg";
-
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedId = index;
-                        images = filmImages[index].photoPaths ?? [];
-                        mainController.loadVideoById(videoId: videoId);
-                      });
-                    },
-                    child: Container(
-                      width: 150,
-                      margin: const EdgeInsets.only(right: 12),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: selectedId == index
-                              ? Colors.blueAccent
-                              : Colors.grey.shade300,
-                          width: 2,
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
-                        child: AspectRatio(
-                          aspectRatio: 16 / 9,
-                          child: Image.network(
-                            thumbnailUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Icon(Icons.error),
-                          ),
-                        ),
+                          Center(child: _buildCreditsSection(film)),
+                        ],
                       ),
                     ),
-                  );
-                },
+                  ),
+
+                  // 🔹 Close Button
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton(
+                      icon: const Icon(Icons.close, size: 28),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ),
+                ],
               ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // 🎬 Main YouTube Video
-            Center(
-              child: AspectRatio(
-                aspectRatio: 16 / 9,
-                child: YoutubePlayer(controller: mainController),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-            const Text(
-              "CREDITS",
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.2,
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // 📃 Film Credits
-            if (filmImages.isNotEmpty)
-              _buildCreditsSection(filmImages[selectedId])
-            else
-              const Text(
-                "No details available for this video.",
-                style: TextStyle(fontSize: 16, color: Colors.black54),
-              ),
-
-            const SizedBox(height: 30),
-            // if (images.isNotEmpty)
-            //   _bottomImageSection(images),
-          ],
-        );
-      },
+            );
+          },
+        ),
+      ),
     );
   }
 
-  /// Helper widget for credits
-  Widget _buildCreditsSection(Trailer film) {
+  Widget _buildFilmDetails(BuildContext context, Trailer film) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    // Adjust font size based on screen width
+    double fontSize = screenWidth < 600 ? 14 : 16;
+    double spacing = screenWidth < 600 ? 6 : 8;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (film.filmName.isNotEmpty)
-          _creditRow("Film", film.filmName),
-        if (film.yearOfRelease.isNotEmpty)
-          _creditRow("Released in", film.yearOfRelease),
-        if (film.directorName.isNotEmpty)
-          _creditRow("Director", film.directorName),
-        if (film.dopName.isNotEmpty)
-          _creditRow("Cinematographer", film.dopName),
-        if (film.myDesignation.isNotEmpty)
-          _creditRow(film.myDesignation, "Naveen Chempodi"),
-        if (film.productionHouse.isNotEmpty)
-          _creditRow("Production house", film.productionHouse),
+        Text(
+          "Type: ${film.category}",
+          style: TextStyle(fontSize: fontSize),
+        ),
+        SizedBox(height: spacing),
+        Text(
+          "Synopsis: ${film.description}",
+          style: TextStyle(fontSize: fontSize),
+        ),
+        SizedBox(height: spacing),
+        Text(
+          "Year: ${film.yearOfRelease}",
+          style: TextStyle(fontSize: fontSize),
+        ),
       ],
     );
   }
 
-  /// Generic credit row
-  Widget _creditRow(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildCreditsSection(Trailer film) {
+    final credits = <String, String>{
+      "Director of Photography": "Naveen Chempodi",
+      if (film.credit.screenplay.isNotEmpty) "Screenplay": film.credit.screenplay,
+      if (film.credit.editor.isNotEmpty) "Editor": film.credit.editor,
+      if (film.credit.di.isNotEmpty) "DI": film.credit.di,
+      if (film.credit.art_director.isNotEmpty) "Art Director": film.credit.art_director,
+      if (film.credit.sync_sound.isNotEmpty) "Sync Sound": film.credit.sync_sound,
+      if (film.credit.production.isNotEmpty) "Production": film.credit.production,
+    };
+
+    return Center(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            "$title: ",
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
+          const Text(
+            "CREDITS",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            textAlign: TextAlign.center,
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black54,
-              ),
-            ),
+          const SizedBox(height: 16),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: credits.entries
+                .map((entry) => _creditRow(context,entry.key, entry.value))
+                .toList(),
           ),
         ],
       ),
     );
   }
 
-  Widget _bottomImageSection(List<String> imagePaths) {
+  Widget _creditRow(BuildContext context, String title, String name) {
+    double screenWidth = MediaQuery.of(context).size.width;
 
-    final PageController pageController = PageController();
-    int selectedIndex = 0;
+    // Adjust font size based on screen width
+    double fontSize = screenWidth < 600 ? 14 : 16; // smaller font for small screens
+    double valueFontSize = screenWidth < 600 ? 14 : 16;
 
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return Column(
-          children: [
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  height: 400,
-                  width: double.infinity,
-                  child: PageView.builder(
-                    controller: pageController,
-                    itemCount: imagePaths.length,
-                    onPageChanged: (index) {
-                      setState(() {
-                        selectedIndex = index;
-                      });
-                    },
-                    itemBuilder: (context, index) {
-                      return Image.asset(
-                        imagePaths[index],
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                      );
-                    },
-                  ),
-                ),
+    // Adjust column width proportionally
+    double columnWidth = screenWidth < 600 ? 120 : 200;
 
-                // Left button
-                Positioned(
-                  left: 10,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-                    onPressed: () {
-                      if (selectedIndex > 0) {
-                        selectedIndex--;
-                        setState(() {});
-                        pageController.animateToPage(
-                          selectedIndex,
-                          duration: const Duration(milliseconds: 400),
-                          curve: Curves.easeInOut,
-                        );
-                      }
-                    },
-                  ),
-                ),
-
-                // Right button
-                Positioned(
-                  right: 10,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_forward_ios, color: Colors.white),
-                    onPressed: () {
-                      if (selectedIndex < imagePaths.length - 1) {
-                        selectedIndex++;
-                        setState(() {});
-                        pageController.animateToPage(
-                          selectedIndex,
-                          duration: const Duration(milliseconds: 400),
-                          curve: Curves.easeInOut,
-                        );
-                      }
-                    },
-                  ),
-                ),
-              ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: columnWidth,
+            child: Text(
+              title,
+              style: TextStyle(fontSize: fontSize),
+              textAlign: TextAlign.left,
             ),
-
-            const SizedBox(height: 30),
-
-            Center(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (int i = 0; i < imagePaths.length; i++)
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedIndex = i;
-                          });
-                          pageController.animateToPage(
-                            i,
-                            duration: const Duration(milliseconds: 400),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(6),
-                            child: Image.asset(
-                              imagePaths[i],
-                              fit: BoxFit.cover,
-                              width: 50,
-                              height: 50,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
+          ),
+          const SizedBox(width: 10),
+          SizedBox(
+            width: columnWidth,
+            child: Text(
+              name,
+              style: TextStyle(fontSize: valueFontSize, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.left,
+              softWrap: true,
             ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildPhotosSection(BuildContext context) {
-    final List<String> streetPhotos = [
-      "assets/images/image24.jpeg",
-      "assets/images/image6.jpeg",
-      "assets/images/image17.jpeg",
-      "assets/images/image7.jpeg",
-      "assets/images/image15.jpg",
-      "assets/images/image16.jpeg",
-      "assets/images/image18.jpeg",
-      "assets/images/image8.jpeg",
-      "assets/images/image11.jpeg",
-      "assets/images/image12.jpeg",
-      "assets/images/image13.jpeg",
-      "assets/images/image5.jpeg",
-      "assets/images/image4.jpeg",
-      "assets/images/image3.jpeg",
-      "assets/images/image2.jpeg",
-      "assets/images/image9.jpeg",
-      "assets/images/image19.png",
-      "assets/images/image20.png",
-      "assets/images/image22.png",
-      "assets/images/image23.png",
-    ];
-
-    int _getCrossAxisCount(BuildContext context) {
-      double width = MediaQuery.of(context).size.width;
-      if (width < 600) return 2; // Mobile
-      if (width < 900) return 3; // Tablet
-      return 4; // Desktop
-    }
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const AlwaysScrollableScrollPhysics(), // ✅ scrollable grid
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: _getCrossAxisCount(context),
-        crossAxisSpacing: 4,
-        mainAxisSpacing: 4,
+          ),
+        ],
       ),
-      itemCount: streetPhotos.length,
-      itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () {
-            showDialog(
-              context: context,
-              barrierDismissible: true,
-              builder: (context) {
-                return Dialog(
-                  backgroundColor: Colors.transparent,
-                  insetPadding: const EdgeInsets.all(8),
-                  child: GestureDetector(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Container(
-                      color: Colors.black54,
-                      child: Center(
-                        child: InteractiveViewer(
-                          clipBehavior: Clip.none,
-                          child: Image.asset(
-                            streetPhotos[index],
-                            fit: BoxFit.contain,
-                            width: MediaQuery.of(context).size.width * 0.9,
-                            height: MediaQuery.of(context).size.height * 0.9,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          },
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: Image.asset(
-              streetPhotos[index],
-              fit: BoxFit.cover,
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _launchEmail() async {
-    final Uri emailUri = Uri(
-      scheme: 'mailto',
-      path: 'naveenchempodi@email.com',
-      query: 'subject=Let\'s Connect&body=Hi Naveen,', // optional
-    );
-
-    if (!await launchUrl(emailUri)) {
-      throw Exception('Could not launch $emailUri');
-    }
-  }
-
-  Widget _buildBioSection() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        bool isWide = constraints.maxWidth > 800;
-
-        return SingleChildScrollView(
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: Padding(
-              padding: EdgeInsets.all(isWide ? 100 : 20),
-              child: isWide
-                  ? Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Left side image
-                  Expanded(
-                    flex: 1,
-                    child: Image.asset(
-                      "assets/images/image21.png",
-                      fit: BoxFit.cover,
-                      height: 400,
-                    ),
-                  ),
-                  const SizedBox(width: 40),
-
-                  // Right side text
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Hi, my name is Naveen Chempodi.\nI'm a cinematographer based in Cochin, Kerala.",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                              height: 1.6),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "Over the past 8 years, I have brought stories to life as a cinematographer for commercials,\nshort films, feature films, and musicals, partnering with renowned production houses and brands.",
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black87,
-                              height: 1.6),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "-",
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black87,
-                              height: 1.6),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "Contact:",
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black87),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          "Phone: 99954407888",
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                              height: 1.6),
-                        ),
-                        const Text(
-                          "Email: naveenchempodi@gmail.com",
-                          style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black87,
-                              height: 1.6),
-                        ),
-                        const SizedBox(height: 12),
-                        ElevatedButton(
-                          onPressed: _launchEmail,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black87,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 12),
-                          ),
-                          child: const Text("Connect"),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              )
-                  : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Image.asset("assets/images/image21.png",
-                      fit: BoxFit.cover, height: 300),
-                  const SizedBox(height: 12),
-                  const Text(
-                    "Hi, my name is Naveen Chempodi.\nI'm a cinematographer based in Cochin, Kerala",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                        height: 1.6),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "Over the past 8 years, I have brought stories to life as a cinematographer for commercials, short films, feature films, and musicals, partnering with renowned production houses and brands.",
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black87,
-                        height: 1.6),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "-",
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black87,
-                        height: 1.6),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Contact:",
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.black87),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    "Phone: 99954407888",
-                    style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
-                        height: 1.6),
-                  ),
-                  const Text(
-                    "Email: naveenchempodi@gmail.com",
-                    style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black87,
-                        height: 1.6),
-                  ),
-                  const SizedBox(height: 12),
-                  ElevatedButton(
-                    onPressed: _launchEmail,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black87,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 12),
-                    ),
-                    child: const Text("Connect"),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
     );
   }
 
