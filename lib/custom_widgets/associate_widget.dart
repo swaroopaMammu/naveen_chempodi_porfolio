@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:portfolio_website/custom_widgets/thumbnail_widget.dart';
 
 import '../models/cinematograpghy_modals.dart';
@@ -83,44 +84,54 @@ class _AssoWorkSectionState extends State<AssoWorkSection> {
     );
   }
 
-  Widget _buildPosterView(List<FeaturedWork> films) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            bool isWide = constraints.maxWidth > 900;
-            int crossAxisCount = isWide ? 4 : 2;
+  Widget _buildPosterView(List<AssociatedWork> films) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        bool isWide = constraints.maxWidth > 900;
+        int crossAxisCount = isWide ? 4 : 2;
 
-            return SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: crossAxisCount,
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 2 / 3, // poster ratio
-                    ),
-                    itemCount: films.length,
-                    itemBuilder: (context, index) {
-                      final film = films[index];
-                      return GestureDetector(
-                        onTap: () =>   widget.onCategoryChanged(film.trailerId),
-                        child: ClipRRect(
-                          child: Image.asset(
-                            film.poster,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Icon(Icons.error, size: 40),
-                          ),
+        return GridView.builder(
+          padding: const EdgeInsets.all(16),
+          shrinkWrap: true,
+          physics: const BouncingScrollPhysics(), // smoother scroll
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 16,
+            childAspectRatio: 2 / 3, // poster ratio
+          ),
+          itemCount: films.length,
+          itemBuilder: (context, index) {
+            final film = films[index];
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => widget.onCategoryChanged(film.trailerId),
+                    child: ClipRRect(
+                      child: AspectRatio(
+                        aspectRatio: 2 / 3, // fix poster shape
+                        child: Image.asset(
+                          film.poster,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                          const Icon(Icons.error, size: 40),
                         ),
-                      );
-                    },
+                      ),
+                    ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  film.designation,
+                  style: GoogleFonts.lora(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                )
+              ],
             );
           },
         );
@@ -128,19 +139,20 @@ class _AssoWorkSectionState extends State<AssoWorkSection> {
     );
   }
 
+
   Widget _buildSubContent() {
     switch (_selectedSubPage) {
       case "Feature Films":{
-        final  List<FeaturedWork> filmImages = repo.getFilms();
+        final  List<AssociatedWork> filmImages = repo.getFilms();
         return _buildPosterView(filmImages);
       }
       case "Web Series" :{
-        final  List<FeaturedWork> filmImages = repo.getWebSeries();
+        final  List<AssociatedWork> filmImages = repo.getWebSeries();
         return _buildPosterView(filmImages);
       }
       case "Commercial ads":
         {
-          final  List<FeaturedWork> commercials = repo.getCommercials();
+          final  List<AssociatedWork> commercials = repo.getCommercials();
           return ThumbnailGridView(
             films: commercials,
             onTrailerTap: (trailerId) {

@@ -24,9 +24,13 @@ class FeaturedWork {
 class AssociatedWork{
   final String trailerId;
   final String poster;
+  final String title;
+  final String designation;
   AssociatedWork({
     required this.trailerId,
     required this.poster,
+    required this.title,
+    required this.designation,
 });
 }
 
@@ -36,6 +40,7 @@ class Credit{
   final String editor;
   final String art_director;
   final String sync_sound;
+  final String music;
   final String production;
   final String di;
 
@@ -45,6 +50,7 @@ class Credit{
     required this.editor,
     required this.art_director,
     required this.sync_sound,
+    required this.music,
     required this.production,
     required this.di,
   });
