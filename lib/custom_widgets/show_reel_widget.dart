@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:video_player/video_player.dart';
 
-class HomeContentGrid extends StatefulWidget {
+class ShowReelWidget extends StatefulWidget {
   final Widget footer;
 
-  const HomeContentGrid({
+  const ShowReelWidget({
     super.key,
     required this.footer,
   });
 
   @override
-  State<HomeContentGrid> createState() => _HomeContentGridState();
+  State<ShowReelWidget> createState() => _ShowReelWidgetState();
 }
 
-class _HomeContentGridState extends State<HomeContentGrid> {
+class _ShowReelWidgetState extends State<ShowReelWidget> {
   late List<VideoPlayerController> _controllers;
 
   @override
@@ -33,6 +34,8 @@ class _HomeContentGridState extends State<HomeContentGrid> {
           setState(() {});
         });
       controller.setLooping(true);
+      controller.setVolume(0);
+      controller.play();
       return controller;
     }).toList();
   }
@@ -51,30 +54,30 @@ class _HomeContentGridState extends State<HomeContentGrid> {
       builder: (context, constraints) {
         double maxWidth = constraints.maxWidth;
         int crossAxisCount = maxWidth < 600 ? 1 : 2;
-
+        double fontSize = maxWidth < 600 ? 24 : 34;
         return ListView(
           shrinkWrap: true,
           children: [
             const SizedBox(height: 20),
-            const Center(
+             Center(
               child: Text(
                 "Cinematography Showreel",
-                style: TextStyle(
-                  fontSize: 34,
+                style: GoogleFonts.lora(
+                  fontSize: fontSize,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
             const SizedBox(height: 20),
             Padding(
-              padding: const EdgeInsets.all(40),
+              padding:  EdgeInsets.all(0),
               child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: 40,
-                  mainAxisSpacing: 40,
+                  crossAxisSpacing: 0,
+                  mainAxisSpacing: 0,
                   childAspectRatio: 16 / 9,
                 ),
                 itemCount: _controllers.length,
@@ -105,44 +108,83 @@ class _VideoGridItem extends StatefulWidget {
 }
 
 class _VideoGridItemState extends State<_VideoGridItem> {
+  bool showOverlay = true;
+
+  void setButton(){
+    if (widget.controller.value.isPlaying && showOverlay) {
+      showOverlay = false;
+    }
+    else if (widget.controller.value.isPlaying) {
+      widget.controller.pause();
+      showOverlay = true;
+    } else {
+      widget.controller.play();
+      showOverlay = false;
+    }
+    widget.controller.setVolume(10);
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = widget.controller;
-
-    return controller.value.isInitialized
-        ? Stack(
-      alignment: Alignment.center,
-      children: [
-        ClipRRect(
-          child: SizedBox.expand(
-            child: FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox(
-                width: controller.value.size.width,
-                height: controller.value.size.height,
-                child: VideoPlayer(controller),
+    return
+      GestureDetector(
+      onTap: (){
+        setState(() {
+          setButton();
+        });
+      },
+          child: Stack(
+                alignment: Alignment.center,
+                children: [
+          ClipRRect(
+            child: SizedBox.expand(
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: controller.value.size.width,
+                  height: controller.value.size.height,
+                  child:controller.value.isInitialized
+                      ? VideoPlayer(controller)
+                      : Container(
+                    color: Colors.grey[300],
+                    child: const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-        IconButton(
-          iconSize: 48,
-          color: Colors.white,
-          icon: Icon(
-            controller.value.isPlaying
-                ? Icons.pause_circle_filled
-                : Icons.play_circle_fill,
+          Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+          if (showOverlay)
+          IconButton(
+            iconSize: 48,
+            color: Colors.white,
+            icon: Icon(
+                  Icons.play_circle_fill,
+            ),
+            onPressed: () {
+              setState(() {
+                setButton();
+              });
+            },
           ),
-          onPressed: () {
-            setState(() {
-              controller.value.isPlaying
-                  ? controller.pause()
-                  : controller.play();
-            });
-          },
-        ),
-      ],
-    )
-        : const Center(child: CircularProgressIndicator());
+                ],
+              ),
+        );
   }
 }

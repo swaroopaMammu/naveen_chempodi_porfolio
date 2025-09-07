@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../models/cinematograpghy_modals.dart';
 
 class FeaturedWorkGrid extends StatelessWidget {
-  final List<Trailer> films;
-  final void Function(Trailer film) onTrailerTap;
+  final List<FeaturedWork> films;
+  final void Function(FeaturedWork film) onTrailerTap;
 
   const FeaturedWorkGrid({
     super.key,
@@ -17,17 +17,17 @@ class FeaturedWorkGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         bool isWide = constraints.maxWidth > 900;
-        int crossAxisCount = isWide ? 3 : 2;
+        int crossAxisCount = isWide ? 3 : 1;
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(10),
           child: GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: crossAxisCount,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
               childAspectRatio: 16 / 9,
             ),
             itemCount: films.length,
@@ -46,7 +46,7 @@ class FeaturedWorkGrid extends StatelessWidget {
 }
 
 class _FeaturedWorkItem extends StatefulWidget {
-  final Trailer film;
+  final FeaturedWork film;
   final VoidCallback onTap;
 
   const _FeaturedWorkItem({

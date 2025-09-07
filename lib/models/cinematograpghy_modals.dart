@@ -1,5 +1,5 @@
 
-class Trailer {
+class FeaturedWork {
   final String trailerId;
   final String filmName;
   final String description;
@@ -9,7 +9,7 @@ class Trailer {
   final String poster;
   final Credit credit;
 
-  Trailer({
+  FeaturedWork({
     required this.trailerId,
     required this.filmName,
     required this.yearOfRelease,
@@ -19,6 +19,15 @@ class Trailer {
     required this.poster,
     required this.credit
   });
+}
+
+class AssociatedWork{
+  final String trailerId;
+  final String poster;
+  AssociatedWork({
+    required this.trailerId,
+    required this.poster,
+});
 }
 
 class Credit{

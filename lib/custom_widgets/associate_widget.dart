@@ -83,7 +83,7 @@ class _AssoWorkSectionState extends State<AssoWorkSection> {
     );
   }
 
-  Widget _buildPosterView(List<Trailer> films) {
+  Widget _buildPosterView(List<FeaturedWork> films) {
     return StatefulBuilder(
       builder: (context, setState) {
         return LayoutBuilder(
@@ -110,10 +110,10 @@ class _AssoWorkSectionState extends State<AssoWorkSection> {
                       return GestureDetector(
                         onTap: () =>   widget.onCategoryChanged(film.trailerId),
                         child: ClipRRect(
-                          child: Image.network(
+                          child: Image.asset(
                             film.poster,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Icon(Icons.error),
+                            errorBuilder: (_, __, ___) => const Icon(Icons.error, size: 40),
                           ),
                         ),
                       );
@@ -131,21 +131,20 @@ class _AssoWorkSectionState extends State<AssoWorkSection> {
   Widget _buildSubContent() {
     switch (_selectedSubPage) {
       case "Feature Films":{
-        final  List<Trailer> filmImages = repo.getFilms();
+        final  List<FeaturedWork> filmImages = repo.getFilms();
         return _buildPosterView(filmImages);
       }
       case "Web Series" :{
-        final  List<Trailer> filmImages = repo.getWebSeries();
+        final  List<FeaturedWork> filmImages = repo.getWebSeries();
         return _buildPosterView(filmImages);
       }
       case "Commercial ads":
         {
-          final  List<Trailer> commercials = repo.getCommercials();
+          final  List<FeaturedWork> commercials = repo.getCommercials();
           return ThumbnailGridView(
             films: commercials,
             onTrailerTap: (trailerId) {
               widget.onCategoryChanged(trailerId);
-            //  _showYoutubeModal(context, trailerId); // your existing modal function
             },
           );
         }

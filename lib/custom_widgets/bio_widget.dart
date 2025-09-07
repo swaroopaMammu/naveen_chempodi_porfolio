@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class BioSection extends StatelessWidget {
   const BioSection({super.key});
 
-  Widget _bioTextBlock() => const Text(
+  Widget _bioTextBlock() =>  Text(
     "Hi, my name is Naveen Chempodi.\nI'm a cinematographer based in Cochin, Kerala.",
-    style: TextStyle(
+    style: GoogleFonts.lora(
       fontSize: 16,
       fontWeight: FontWeight.bold,
       color: Colors.black87,
@@ -15,10 +16,10 @@ class BioSection extends StatelessWidget {
     ),
   );
 
-  Widget _bioDescription() => const Text(
+  Widget _bioDescription() =>  Text(
     "Over the past 8 years, I have brought stories to life as a cinematographer for commercials, "
         "short films, feature films, and musicals, partnering with renowned production houses and brands.",
-    style: TextStyle(
+    style: GoogleFonts.lora(
       fontSize: 16,
       color: Colors.black87,
       height: 1.6,
@@ -31,7 +32,7 @@ class BioSection extends StatelessWidget {
   );
 
   void _openWhatsApp() async {
-    const phone = "+919995440788";
+    const phone = "+919995407888";
     final url = Uri.parse("https://wa.me/$phone");
 
     if (await canLaunchUrl(url)) {
@@ -56,15 +57,15 @@ class BioSection extends StatelessWidget {
   Widget _contactBlock() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      const Text("Contact:",
-          style: TextStyle(fontSize: 16, color: Colors.black87)),
+       Text("Contact:",
+          style: GoogleFonts.lora(fontSize: 16, color: Colors.black87)),
       const SizedBox(height: 8),
-      const Text("Phone: 9995407888",
-          style: TextStyle(fontSize: 14, color: Colors.black87, height: 1.6)),
-      const Text("Email: naveenchempodi@gmail.com",
-          style: TextStyle(fontSize: 14, color: Colors.black87, height: 1.6)),
+       Text("Phone: 9995407888",
+          style: GoogleFonts.lora(fontSize: 14, color: Colors.black87, height: 1.6)),
+       Text("Email: naveenchempodi@gmail.com",
+          style: GoogleFonts.lora(fontSize: 14, color: Colors.black87, height: 1.6)),
       const SizedBox(height: 12),
-      const Text("Connect with me via :"),
+       Text("Connect with me via :",style: GoogleFonts.lora(fontSize: 14, color: Colors.black87, height: 1.6)),
       const SizedBox(height: 5),
       Row(
         children: [

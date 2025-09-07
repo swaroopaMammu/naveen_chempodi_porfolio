@@ -12,6 +12,7 @@ class VideoPlayerWidget extends StatefulWidget {
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   late VideoPlayerController _controller;
   bool _isReady = false;
+  bool showOverlay = true;
 
   @override
   void initState() {
@@ -21,6 +22,16 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
         _controller.setLooping(true);
         setState(() => _isReady = true);
       });
+  }
+
+  void setButton(){
+    if (_controller.value.isPlaying) {
+      _controller.pause();
+      showOverlay = true;
+    } else {
+      _controller.play();
+      showOverlay = false;
+    }
   }
 
   @override
@@ -38,31 +49,49 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       );
     }
 
-    return ClipRRect(
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
-          ),
-          IconButton(
-            iconSize: 48,
-            color: Colors.white,
-            icon: Icon(
-              _controller.value.isPlaying
-                  ? Icons.pause_circle_filled
-                  : Icons.play_circle_fill,
+    return GestureDetector(
+      onTap: (){
+        setState(() {
+          setButton();
+        });
+      },
+      child: ClipRRect(
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              child: VideoPlayer(_controller),
             ),
-            onPressed: () {
-              setState(() {
-                _controller.value.isPlaying
-                    ? _controller.pause()
-                    : _controller.play();
-              });
-            },
-          ),
-        ],
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            if(showOverlay)
+            IconButton(
+              iconSize: 48,
+              color: Colors.white,
+              icon: Icon(
+                Icons.play_circle_fill,
+              ),
+              onPressed: () {
+                setState(() {
+                  setButton();
+                });
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

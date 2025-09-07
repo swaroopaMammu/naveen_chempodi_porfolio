@@ -6,9 +6,10 @@ import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import 'custom_widgets/associate_widget.dart';
 import 'custom_widgets/bio_widget.dart';
 import 'custom_widgets/feature_widget.dart';
-import 'custom_widgets/home_widget.dart';
+import 'custom_widgets/show_reel_widget.dart';
 import 'custom_widgets/video_player_widget.dart';
 import 'models/cinematograpghy_modals.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -62,10 +63,10 @@ class _HomePageState extends State<HomePage> {
                 },
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children:  [
                     Text(
                       "Naveen Chempodi",
-                      style: TextStyle(
+                      style: GoogleFonts.lora(
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.3,
@@ -73,7 +74,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     Text(
                       "Cinematographer",
-                      style: TextStyle(
+                      style: GoogleFonts.lora(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         color: Colors.grey,
@@ -149,12 +150,12 @@ class _HomePageState extends State<HomePage> {
     }
     switch (_selectedPage) {
       case "Showreel":
-        return HomeContentGrid(footer:  _buildFooter());
+        return ShowReelWidget(footer:  _buildFooter());
       case "Bio":
         return BioSection();
       case "Featured Work":
         {
-          final  List<Trailer> works = repo.getFeatureWork();
+          final  List<FeaturedWork> works = repo.getFeatureWork();
           return FeaturedWorkGrid(
             films: works,
             onTrailerTap: (film) {
@@ -200,7 +201,7 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.symmetric(vertical: 16),
         child: Text(
           text,
-          style: const TextStyle(
+          style:  GoogleFonts.lora(
             color: Colors.black,
             fontSize: 22,
             fontWeight: FontWeight.w500,
@@ -227,29 +228,47 @@ class _HomePageState extends State<HomePage> {
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.all(30),
-        child: Center(
-          child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: YoutubePlayer(controller: controller),
-          ),
+        child: Stack(
+          children: [
+            Align(
+              alignment: Alignment.topRight,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 28),
+                onPressed: () {
+                  controller.stopVideo();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Center(
+                child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: YoutubePlayer(controller: controller),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  void _showFeaturedVideoModal(BuildContext context, {required Trailer film}) {
+  void _showFeaturedVideoModal(BuildContext context, {required FeaturedWork film}) {
     showDialog(
       context: context,
       barrierDismissible: true,
       barrierColor: Colors.black54,
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(20),
+        insetPadding: const EdgeInsets.all(10),
         child: LayoutBuilder(
           builder: (context, constraints) {
             double maxWidth = constraints.maxWidth * 0.9;
             double maxHeight = constraints.maxHeight * 0.9;
             bool isSmallScreen = constraints.maxWidth < 600;
+            double bottomPadding = constraints.maxWidth < 600 ? 10 : 40;
 
             return Center(
               child: Stack(
@@ -258,10 +277,9 @@ class _HomePageState extends State<HomePage> {
                   Container(
                     width: maxWidth,
                     height: maxHeight,
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: SingleChildScrollView(
                       child: Column(
@@ -269,46 +287,53 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           const SizedBox(height: 30),
                           isSmallScreen
-                              ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "${film.filmName} (${film.yearOfRelease})",
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              _buildFilmDetails(context,film),
-                            ],
-                          )
-                              : Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: Text(
+                              ? Padding(
+                            padding: const EdgeInsets.only(left: 5, right: 5),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
                                   "${film.filmName} (${film.yearOfRelease})",
-                                  style: const TextStyle(
-                                    fontSize: 28,
+                                  style: GoogleFonts.lora(
+                                    fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 20),
-                              Expanded(
-                                flex: 3,
-                                child: _buildFilmDetails(context,film),
-                              ),
-                            ],
+                                const SizedBox(height: 12),
+                                _buildFilmDetails(context, film),
+                              ],
+                            ),
+                          )
+                              : Padding(
+                            padding: const EdgeInsets.only(left: 5, right: 5),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                    "${film.filmName} (${film.yearOfRelease})",
+                                    style: GoogleFonts.lora(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                const SizedBox(width: 20),
+                                Expanded(
+                                  flex: 3,
+                                  child: _buildFilmDetails(context, film),
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 30),
                           Column(
                             children: film.videoPaths.map((assetPath) {
                               return Padding(
-                                padding: const EdgeInsets.only(bottom: 40),
+                                padding: EdgeInsets.only(bottom: bottomPadding),
                                 child: VideoPlayerWidget(assetPath: assetPath),
                               );
                             }).toList(),
@@ -337,11 +362,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildFilmDetails(BuildContext context, Trailer film) {
+  Widget _buildFilmDetails(BuildContext context, FeaturedWork film) {
     double screenWidth = MediaQuery.of(context).size.width;
 
     // Adjust font size based on screen width
-    double fontSize = screenWidth < 600 ? 14 : 16;
+    double fontSize = screenWidth < 600 ? 12 : 14;
     double spacing = screenWidth < 600 ? 6 : 8;
 
     return Column(
@@ -349,23 +374,32 @@ class _HomePageState extends State<HomePage> {
       children: [
         Text(
           "Type: ${film.category}",
-          style: TextStyle(fontSize: fontSize),
+          style: GoogleFonts.lora(fontSize: fontSize,fontWeight:FontWeight.w500),
         ),
         SizedBox(height: spacing),
         Text(
           "Synopsis: ${film.description}",
-          style: TextStyle(fontSize: fontSize),
+          style: GoogleFonts.lora(fontSize: fontSize,fontWeight:FontWeight.w500),
         ),
         SizedBox(height: spacing),
         Text(
           "Year: ${film.yearOfRelease}",
-          style: TextStyle(fontSize: fontSize),
+          style: GoogleFonts.lora(fontSize: fontSize,fontWeight:FontWeight.w500),
+        ),
+        GestureDetector(
+          onTap: (){
+            _showYoutubeModal(context, film.trailerId);
+          },
+          child: Text(
+            "Youtube link",
+            style: GoogleFonts.lora(fontSize: 10, color: Colors.blue),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildCreditsSection(Trailer film) {
+  Widget _buildCreditsSection(FeaturedWork film) {
     final credits = <String, String>{
       "Director of Photography": "Naveen Chempodi",
       if (film.credit.screenplay.isNotEmpty) "Screenplay": film.credit.screenplay,
@@ -375,14 +409,15 @@ class _HomePageState extends State<HomePage> {
       if (film.credit.sync_sound.isNotEmpty) "Sync Sound": film.credit.sync_sound,
       if (film.credit.production.isNotEmpty) "Production": film.credit.production,
     };
-
     return Center(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Text(
+          Text(
             "CREDITS",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            style: GoogleFonts.lora(
+              fontSize: 16, fontWeight: FontWeight.w500,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
@@ -400,11 +435,9 @@ class _HomePageState extends State<HomePage> {
   Widget _creditRow(BuildContext context, String title, String name) {
     double screenWidth = MediaQuery.of(context).size.width;
 
-    // Adjust font size based on screen width
-    double fontSize = screenWidth < 600 ? 14 : 16; // smaller font for small screens
+    double fontSize = screenWidth < 600 ? 14 : 16;
     double valueFontSize = screenWidth < 600 ? 14 : 16;
 
-    // Adjust column width proportionally
     double columnWidth = screenWidth < 600 ? 120 : 200;
 
     return Padding(
@@ -417,7 +450,7 @@ class _HomePageState extends State<HomePage> {
             width: columnWidth,
             child: Text(
               title,
-              style: TextStyle(fontSize: fontSize),
+              style:GoogleFonts.lora(fontSize: fontSize),
               textAlign: TextAlign.left,
             ),
           ),
@@ -426,7 +459,7 @@ class _HomePageState extends State<HomePage> {
             width: columnWidth,
             child: Text(
               name,
-              style: TextStyle(fontSize: valueFontSize, fontWeight: FontWeight.w500),
+              style: GoogleFonts.lora(fontSize: valueFontSize, fontWeight: FontWeight.w500),
               textAlign: TextAlign.left,
               softWrap: true,
             ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/cinematograpghy_modals.dart';
 
 class ThumbnailGridView extends StatelessWidget {
-  final List<Trailer> films;
+  final List<FeaturedWork> films;
   final void Function(String trailerId) onTrailerTap;
 
   const ThumbnailGridView({
