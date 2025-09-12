@@ -26,11 +26,13 @@ class AssociatedWork{
   final String poster;
   final String title;
   final String designation;
+  final String category;
   AssociatedWork({
     required this.trailerId,
     required this.poster,
     required this.title,
     required this.designation,
+    required this.category
 });
 }
 

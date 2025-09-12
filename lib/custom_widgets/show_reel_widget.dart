@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:portfolio_website/models/cinematograpghy_modals.dart';
 import 'package:video_player/video_player.dart';
 
-import 'bio_widget.dart';
-
 class ShowReelWidget extends StatefulWidget {
-  final Widget footer;
+  final List<FeaturedWork> films;
+  final void Function(String category) onCardTap;
 
-  const ShowReelWidget({
+  const  ShowReelWidget({
     super.key,
-    required this.footer,
+    required this.films,
+    required this.onCardTap
   });
 
   @override
@@ -17,36 +18,23 @@ class ShowReelWidget extends StatefulWidget {
 }
 
 class _ShowReelWidgetState extends State<ShowReelWidget> {
-  late List<VideoPlayerController> _controllers;
-
+  late VideoPlayerController _controller;
   @override
   void initState() {
     super.initState();
-    final videos = [
-      "assets/images/football.mp4",
-      "assets/images/video1.mp4",
-      "assets/images/video2.mp4",
-      "assets/images/video3.mp4",
-      "assets/images/video4.mp4",
-      "assets/images/video5.mp4",
-    ];
-    _controllers = videos.map((path) {
-      final controller =  VideoPlayerController.asset(path)
+    final path = "assets/videos/priceless_smile06.mp4";
+    _controller =  VideoPlayerController.asset(path)
         ..initialize().then((_) {
           setState(() {});
         });
-      controller.setLooping(true);
-      controller.setVolume(0);
-      controller.play();
-      return controller;
-    }).toList();
+    _controller.setLooping(true);
+    _controller.setVolume(0);
+    _controller.play();
   }
 
   @override
   void dispose() {
-    for( var controller in _controllers){
-      controller.dispose();
-    }
+      _controller.dispose();
     super.dispose();
   }
 
@@ -55,68 +43,118 @@ class _ShowReelWidgetState extends State<ShowReelWidget> {
     return LayoutBuilder(
       builder: (context, constraints) {
         double maxWidth = constraints.maxWidth;
-        int crossAxisCount = maxWidth < 600 ? 1 : 2;
-        double fontSize = maxWidth < 600 ? 24 : 34;
-        return ListView(
-          shrinkWrap: true,
-          children: [
-            const SizedBox(height: 20),
-             Center(
-              child: Text(
-                "Cinematography Showreel",
-                style: GoogleFonts.lora(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Padding(
-              padding:  EdgeInsets.all(0),
-              child: GridView.builder(
+        bool isWide = maxWidth > 600;
+        double leftRight = isWide ? maxWidth*0.15 :20;
+        return Padding(
+          padding: EdgeInsets.only(left: leftRight,right: leftRight,top: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
+                  crossAxisCount: 1,
                   crossAxisSpacing: 0,
                   mainAxisSpacing: 0,
                   childAspectRatio: 16 / 9,
                 ),
-                itemCount: _controllers.length,
+                itemCount: 1,
                 itemBuilder: (context, index) {
-                  final controller = _controllers[index];
-                  return _VideoGridItem(controller: controller);
+                  final controller = _controller;
+                  return VideoGridItem(controller: controller);
                 },
               ),
-            ),
-            const SizedBox(height: 40),
-            widget.footer,
-            const SizedBox(height: 20),
-          ],
+              const SizedBox(height: 20),
+              if(isWide)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: widget.films.map((film) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        GestureDetector(
+                          onTap:(){
+                            widget.onCardTap(film.category);
+                          },
+                          child: ClipRRect(
+                            child: Image.network(
+                              film.poster,
+                              fit: BoxFit.cover,
+                              height: maxWidth*0.17,
+                              errorBuilder: (_, __, ___) =>
+                              const Icon(Icons.error),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          film.category,
+                          style: GoogleFonts.akatab(
+                            color: Colors.grey,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                )
+
+
+          else
+              for(int i=0;i<widget.films.length;i++)
+              Column(
+                children: [
+                  GestureDetector(
+                     onTap:(){
+                    widget.onCardTap(widget.films[i].category);
+          },
+                    child: ClipRRect(
+                      child: Image.network(
+                        widget.films[i].poster,
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        errorBuilder: (_, __, ___) => const Icon(Icons.error),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(widget.films[i].category,style: GoogleFonts.akatab(
+                    color: Colors.grey,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  )),
+                  const SizedBox(height: 14)
+                ],
+              )
+            ],
+          ),
         );
       },
     );
   }
+
 }
 
 /// Separate StatefulWidget for each video item
-class _VideoGridItem extends StatefulWidget {
+class VideoGridItem extends StatefulWidget {
   final VideoPlayerController controller;
 
-  const _VideoGridItem({required this.controller});
+  const VideoGridItem({required this.controller});
 
   @override
-  State<_VideoGridItem> createState() => _VideoGridItemState();
+  State<VideoGridItem> createState() => _VideoGridItemState();
 }
 
-class _VideoGridItemState extends State<_VideoGridItem> {
+class _VideoGridItemState extends State<VideoGridItem> {
   bool showOverlay = true;
 
-  void setButton(){
+  void setButton() {
     if (widget.controller.value.isPlaying && showOverlay) {
       showOverlay = false;
-    }
-    else if (widget.controller.value.isPlaying) {
+    } else if (widget.controller.value.isPlaying) {
       widget.controller.pause();
       showOverlay = true;
     } else {
@@ -130,63 +168,68 @@ class _VideoGridItemState extends State<_VideoGridItem> {
   Widget build(BuildContext context) {
     final controller = widget.controller;
     return
-      GestureDetector(
-      onTap: (){
-        setState(() {
-          setButton();
-        });
-      },
-          child: Stack(
-                alignment: Alignment.center,
-                children: [
-          ClipRRect(
-            child: SizedBox.expand(
-              child: FittedBox(
-                fit: BoxFit.cover,
-                child: SizedBox(
-                  width: controller.value.size.width,
-                  height: controller.value.size.height,
-                  child:controller.value.isInitialized
-                      ? VideoPlayer(controller)
-                      : Container(
-                    color: Colors.grey[300],
-                    child: const Center(
-                      child: CircularProgressIndicator(),
+      Builder(
+        builder: (context) {
+          return GestureDetector(
+          onTap: (){
+            setState(() {
+              setButton();
+            });
+          },
+              child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+              ClipRRect(
+                child: SizedBox.expand(
+                  child: FittedBox(
+                    fit: BoxFit.cover,
+                    child: SizedBox(
+                      width: controller.value.size.width,
+                      height: controller.value.size.height,
+                      child:controller.value.isInitialized
+                          ? VideoPlayer(controller)
+                          : Container(
+                        color: Colors.grey[300],
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
-          Positioned.fill(
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+              Positioned.fill(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.15),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-          if (showOverlay)
-          IconButton(
-            iconSize: 48,
-            color: Colors.white,
-            icon: Icon(
-                  Icons.play_circle_fill,
-            ),
-            onPressed: () {
-              setState(() {
-                setButton();
-              });
-            },
-          ),
-                ],
+              if (showOverlay)
+              IconButton(
+                iconSize: 48,
+                color: Colors.white,
+                icon: Icon(
+                      Icons.play_circle_fill,
+                ),
+                onPressed: () {
+                  setState(() {
+                    setButton();
+                  });
+                },
               ),
-        );
+                    ],
+                  ),
+            );
+        }
+      );
   }
 }
+

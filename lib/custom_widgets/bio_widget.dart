@@ -5,13 +5,21 @@ import 'package:google_fonts/google_fonts.dart';
 
 class BioSection extends StatelessWidget {
   const BioSection({super.key});
-
   Widget _bioTextBlock() =>  Text(
-    "Hi, my name is Naveen Chempodi.\nI'm a cinematographer based in Cochin, Kerala.",
+    "Hi,",
+    style: GoogleFonts.lora(
+      fontSize: 32,
+      fontWeight: FontWeight.bold,
+      color: Colors.black,
+      height: 1.6,
+    ),
+  );
+  Widget _bioText1Block() =>  Text(
+    "I'm a cinematographer based in Cochin, Kerala.",
     style: GoogleFonts.lora(
       fontSize: 16,
       fontWeight: FontWeight.bold,
-      color: Colors.black87,
+      color: Colors.black,
       height: 1.6,
     ),
   );
@@ -21,7 +29,8 @@ class BioSection extends StatelessWidget {
         "short films, feature films, and musicals, partnering with renowned production houses and brands.",
     style: GoogleFonts.lora(
       fontSize: 16,
-      color: Colors.black87,
+      color: Color.fromARGB(
+          255, 44, 42, 42),
       height: 1.6,
     ),
   );
@@ -57,48 +66,84 @@ class BioSection extends StatelessWidget {
   Widget _contactBlock() => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-       Text("Contact:",
-          style: GoogleFonts.lora(fontSize: 16, color: Colors.black87)),
-      const SizedBox(height: 8),
-       Text("Phone: 9995407888",
-          style: GoogleFonts.lora(fontSize: 14, color: Colors.black87, height: 1.6)),
-       Text("Email: naveenchempodi@gmail.com",
-          style: GoogleFonts.lora(fontSize: 14, color: Colors.black87, height: 1.6)),
-      const SizedBox(height: 12),
        Text("Connect with me via :",style: GoogleFonts.lora(fontSize: 14, color: Colors.black87, height: 1.6)),
-      const SizedBox(height: 5),
+      const SizedBox(height: 10),
       Row(
         children: [
-          IconButton(
-            icon:
-            const FaIcon(FontAwesomeIcons.whatsapp, color: Colors.green),
-            onPressed: _openWhatsApp,
-            tooltip: "Chat on WhatsApp",
-          ),
-          IconButton(
-            icon: const FaIcon(FontAwesomeIcons.envelope, color: Colors.blue),
-            onPressed: _launchEmail,
-            tooltip: "Send mail",
-          ),
+              _buildContactRow(
+                icon: FontAwesomeIcons.whatsapp,
+                label: "WhatsApp",
+                value: "9995407888",
+                onTap: _openWhatsApp,
+              ),
+              const SizedBox(width: 25),
+              _buildContactRow(
+                icon: FontAwesomeIcons.envelope,
+                label: "Email",
+                value: "naveenchempodi@gmail.com",
+                onTap: _launchEmail,
+              ),
         ],
       ),
     ],
   );
 
+  Widget _buildContactRow({
+    required IconData icon,
+    required String label,
+    required String value,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Color(0xFFC0C0C0), width: 1.2),
+            ),
+            child: FaIcon(icon, color: Color(0xFFC0C0C0), size: 18),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: GoogleFonts.akatab(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(
+                      255, 44, 42, 42),
+                ),
+              ),
+              Text(
+                value,
+                style: GoogleFonts.akatab(
+                  fontSize: 14,
+                  color: Color.fromARGB(
+                      255, 44, 42, 42),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
   Widget build(BuildContext context) {
-    final List<String> imagePaths = [
-      "assets/images/image1.jpeg",
-      "assets/images/image2.jpeg",
-      "assets/images/image3.jpeg",
-      "assets/images/image4.jpeg",
-    ];
 
     return LayoutBuilder(
       builder: (context, constraints) {
         bool isWide = constraints.maxWidth > 800;
 
-        return SingleChildScrollView(
-          child: Padding(
+        return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [Padding(
             padding: EdgeInsets.all(isWide ? 100 : 20),
             child: isWide
                 ? Row(
@@ -108,7 +153,7 @@ class BioSection extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: Image.asset(
-                    "assets/images/image21.png",
+                    "assets/images/profile_picture.png",
                     fit: BoxFit.cover,
                     height: 400,
                   ),
@@ -122,6 +167,7 @@ class BioSection extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _bioTextBlock(),
+                      _bioText1Block(),
                       const SizedBox(height: 20),
                       _bioDescription(),
                       const SizedBox(height: 20),
@@ -137,13 +183,14 @@ class BioSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.asset(
-                  "assets/images/image21.png",
+                  "assets/images/profile_picture.png",
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: 300,
                 ),
                 const SizedBox(height: 20),
                 _bioTextBlock(),
+                _bioText1Block(),
                 const SizedBox(height: 10),
                 _bioDescription(),
                 const SizedBox(height: 20),
@@ -152,7 +199,8 @@ class BioSection extends StatelessWidget {
                 _contactBlock(),
               ],
             ),
-          ),
+          )
+          ]
         );
       },
     );

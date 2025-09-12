@@ -2,8 +2,8 @@ import '../models/cinematograpghy_modals.dart';
 
 class CinemaRepository{
 
-  List<FeaturedWork> getFeatureWork(){
-    return {
+  List<FeaturedWork> getFeatureWork(String filter){
+    var list = {
       FeaturedWork(trailerId: "p9OUqWSqPZI",
           filmName: "Co-fee",
           yearOfRelease: "2025",
@@ -17,10 +17,10 @@ class CinemaRepository{
               music: "",
               sync_sound: ""
           ),
-          category: "Advertisement",
-          description:"For Alice is a Malayalam short film narrating about the complex relationship between a mother and her daughter.",
+          category: "Commercial",
+          description:"",
           poster: "https://img.youtube.com/vi/p9OUqWSqPZI/0.jpg",
-          videoPaths: {"assets/videos/cofee_video.mp4"}.toList()),
+          videoPaths: []),
       FeaturedWork(trailerId: "LLjLGWoKJ34",
           filmName: "Ashiyan",
           yearOfRelease: "2022",
@@ -34,10 +34,78 @@ class CinemaRepository{
               di: "",
               sync_sound: ""
           ),
-          description:"For Alice is a Malayalam short film narrating about the complex relationship between a mother and her daughter.",
-          category: "Advertisement",
+          description:"",
+          category: "Commercial",
           poster: "https://img.youtube.com/vi/LLjLGWoKJ34/0.jpg",
-          videoPaths: {"assets/images/image4.jpeg","assets/images/image3.jpeg","assets/images/image2.jpeg"}.toList()),
+          videoPaths: []),
+      FeaturedWork(trailerId: "8KHm0PcVN2I&t=176s",
+          filmName: "Priceless smile",
+          yearOfRelease: "2022",
+          credit: Credit(
+              director: "",
+              production:"",
+              screenplay: "",
+              editor: "",
+              art_director: "",
+              di: "",
+              music: "",
+              sync_sound: ""
+          ),
+          description:"",
+          category: "Commercial",
+          poster: "assets/images/priceless_smile01.jpg",
+          videoPaths: ["assets/videos/priceless_smile01.mp4"]),
+      FeaturedWork(trailerId: "8KHm0PcVN2I&t=176s",
+          filmName: "Priceless smile",
+          yearOfRelease: "2022",
+          credit: Credit(
+              director: "",
+              production:"",
+              screenplay: "",
+              editor: "",
+              art_director: "",
+              di: "",
+              music: "",
+              sync_sound: ""
+          ),
+          description:"",
+          category: "Commercial",
+          poster: "assets/images/priceless_smile02.jpeg",
+          videoPaths: ["assets/videos/priceless_smile02.mp4"]),
+      FeaturedWork(trailerId: "8KHm0PcVN2I&t=176s",
+          filmName: "Priceless smile",
+          yearOfRelease: "2022",
+          credit: Credit(
+              director: "",
+              production:"",
+              screenplay: "",
+              editor: "",
+              art_director: "",
+              di: "",
+              music: "",
+              sync_sound: ""
+          ),
+          description:"",
+          category: "Commercial",
+          poster: "assets/images/priceless_smile03.jpg",
+          videoPaths: ["assets/videos/priceless_smile03.mp4"]),
+      FeaturedWork(trailerId: "8KHm0PcVN2I&t=176s",
+          filmName: "Priceless smile",
+          yearOfRelease: "2022",
+          credit: Credit(
+              director: "",
+              production:"",
+              screenplay: "",
+              editor: "",
+              art_director: "",
+              di: "",
+              music: "",
+              sync_sound: ""
+          ),
+          description:"",
+          category: "Commercial",
+          poster: "assets/images/priceless_smile04.jpg",
+          videoPaths: ["assets/videos/priceless_smile04.mp4"]),
       FeaturedWork(trailerId: "8KHm0PcVN2I&t=176s",
           filmName: "Priceless smile",
           yearOfRelease: "2022",
@@ -52,9 +120,43 @@ class CinemaRepository{
               sync_sound: ""
           ),
           description:"For Alice is a Malayalam short film narrating about the complex relationship between a mother and her daughter.",
-          category: "Advertisement",
-          poster: "https://img.youtube.com/vi/8KHm0PcVN2I/0.jpg",
-          videoPaths: {"assets/videos/priceless_smile_video_1.mp4","assets/videos/priceless_smile_video_2.mp4"}.toList()),
+          category: "Commercial",
+          poster: "assets/images/priceless_smile05.jpg",
+          videoPaths: ["assets/videos/priceless_smile05.mp4"]),
+      FeaturedWork(trailerId: "8KHm0PcVN2I&t=176s",
+          filmName: "Priceless smile",
+          yearOfRelease: "2022",
+          credit: Credit(
+              director: "",
+              production:"",
+              screenplay: "",
+              editor: "",
+              art_director: "",
+              di: "",
+              music: "",
+              sync_sound: ""
+          ),
+          description:"",
+          category: "Commercial",
+          poster: "assets/images/priceless_smile06.jpg",
+          videoPaths: ["assets/videos/priceless_smile06.mp4"]),
+      FeaturedWork(trailerId: "8KHm0PcVN2I&t=176s",
+          filmName: "Priceless smile",
+          yearOfRelease: "2022",
+          credit: Credit(
+              director: "",
+              production:"",
+              screenplay: "",
+              editor: "",
+              art_director: "",
+              di: "",
+              music: "",
+              sync_sound: ""
+          ),
+          description:"For Alice is a Malayalam short film narrating about the complex relationship between a mother and her daughter.",
+          category: "Commercial",
+          poster: "assets/images/priceless_smile07.jpg",
+          videoPaths: ["assets/videos/priceless_smile07.mp4"]),
       FeaturedWork(trailerId: "FvdGBOpMSlU",
           filmName: "For Alice",
           yearOfRelease: "2021",
@@ -71,7 +173,7 @@ class CinemaRepository{
           category: "Short film",
           description:"A crime thriller that unravels love, betrayal, and the complex bond of a mother and daughter.",
           poster: "https://img.youtube.com/vi/FvdGBOpMSlU/0.jpg",
-          videoPaths: {"assets/videos/for_alice_video_1.mp4","assets/videos/for_alice_video_2.mp4","assets/videos/for_alice_video_3.mp4"}.toList()),
+          videoPaths: ["assets/videos/for_alice01.mp4"]),
       FeaturedWork(trailerId: "FWg1O5byix4",
           filmName: "CID moosa",
           yearOfRelease: "2021",
@@ -88,7 +190,7 @@ class CinemaRepository{
           description:"A reimagined cover of a popular movie song, blending its original melody with modern remix elements for a fresh yet emotive experience.",
           category: "Music video",
           poster: "https://img.youtube.com/vi/FWg1O5byix4/0.jpg",
-          videoPaths: {"assets/videos/cid_moosa_1.mp4","assets/videos/cid_moosa_2.mp4"}.toList()),
+          videoPaths: ["assets/videos/cid_moosa01.mp4"]),
       FeaturedWork(trailerId: "aamCbjaaRVA",
           filmName: "Yoodhasinte loha",
           yearOfRelease: "2018",
@@ -105,7 +207,7 @@ class CinemaRepository{
           category: "Short film",
           description:"A crime thriller rooted in scripture, where a killer blurs the line between sin and salvation.",
           poster: "https://img.youtube.com/vi/aamCbjaaRVA/0.jpg",
-          videoPaths: {"assets/videos/yoodhasinte_loha_video_1.mp4"}.toList()),
+          videoPaths: []),
       FeaturedWork(trailerId: "Dwhp1UrXe40",
           filmName: "Etho varmukilin",
           yearOfRelease: "2018",
@@ -122,7 +224,7 @@ class CinemaRepository{
               music: "",
               sync_sound: ""
           ),
-          videoPaths: {"assets/images/image4.jpeg","assets/images/image3.jpeg","assets/images/image2.jpeg"}.toList()),
+          videoPaths: []),
       FeaturedWork(trailerId: "yI6AhvBy2oM",
           filmName: "Rainbow eclipse",
           yearOfRelease: "2017",
@@ -139,7 +241,7 @@ class CinemaRepository{
               music: "",
               sync_sound: ""
           ),
-          videoPaths: {"assets/images/image4.jpeg","assets/images/image3.jpeg","assets/images/image2.jpeg"}.toList()),
+          videoPaths: []),
       FeaturedWork(trailerId: "-5Fxe9S4NrI",
           filmName: "Menaka",
           yearOfRelease: "2019",
@@ -156,7 +258,7 @@ class CinemaRepository{
           ),
           poster: "https://img.youtube.com/vi/-5Fxe9S4NrI/0.jpg",
           description:"A failed writer announces on TV his plan to commit 7 perfect murders in 7 days. After killing his first victim, a police team races to stop his meticulously planned crime spree.",
-          videoPaths: {"assets/videos/menaka_video_1.mp4"}.toList()),
+          videoPaths: []),
       FeaturedWork(trailerId: "gn0y0URMefw",
           filmName: "Ban plastic",
           yearOfRelease: "2018",
@@ -171,116 +273,209 @@ class CinemaRepository{
               sync_sound: ""
           ),
           description:"For Alice is a Malayalam short film narrating about the complex relationship between a mother and her daughter.",
-          category: "Advertisement",
+          category: "Commercial",
           poster: "https://img.youtube.com/vi/gn0y0URMefw/0.jpg",
-          videoPaths: {"assets/images/image4.jpeg","assets/images/image3.jpeg","assets/images/image2.jpeg"}.toList()),
+          videoPaths: []),
+    }.toList();
+
+    return list.where((i) => i.category == filter).toList();
+  }
+
+  List<FeaturedWork> getHomeData(){
+    return {
+      FeaturedWork(trailerId: "8KHm0PcVN2I&t=176s",
+          filmName: "Priceless smile",
+          yearOfRelease: "2022",
+          credit: Credit(
+              director: "",
+              production:"",
+              screenplay: "",
+              editor: "",
+              art_director: "",
+              di: "",
+              music: "",
+              sync_sound: ""
+          ),
+          description:"For Alice is a Malayalam short film narrating about the complex relationship between a mother and her daughter.",
+          category: "Commercial",
+          poster: "https://img.youtube.com/vi/8KHm0PcVN2I/0.jpg",
+          videoPaths: {"assets/videos/priceless_smile01.mp4"}.toList()),
+      FeaturedWork(trailerId: "FvdGBOpMSlU",
+          filmName: "For Alice",
+          yearOfRelease: "2021",
+          credit: Credit(
+              director: "Cathy Jeethu",
+              production:"Bedtime stories",
+              screenplay: "Cathy Jeethu",
+              editor: "Unnikrishnan Gopinathan",
+              art_director: "Rajesh P Velayudhan",
+              music: "",
+              di: "",
+              sync_sound: ""
+          ),
+          category: "Short film",
+          description:"A crime thriller that unravels love, betrayal, and the complex bond of a mother and daughter.",
+          poster: "https://img.youtube.com/vi/FvdGBOpMSlU/0.jpg",
+          videoPaths: ["assets/videos/for_alice01.mp4"]),
+      FeaturedWork(trailerId: "FWg1O5byix4",
+          filmName: "CID moosa",
+          yearOfRelease: "2021",
+          credit: Credit(
+              director: "",
+              production:"Boldova Productions",
+              screenplay: "KS Harishankar",
+              editor: "Renjith Varma",
+              art_director: "Jayan Cryon",
+              di: "Arjun Menon",
+              music: "",
+              sync_sound: "Shibin"
+          ),
+          description:"A reimagined cover of a popular movie song, blending its original melody with modern remix elements for a fresh yet emotive experience.",
+          category: "Music video",
+          poster: "https://img.youtube.com/vi/FWg1O5byix4/0.jpg",
+          videoPaths: ["assets/videos/cid_moosa01.mp4"]),
     }.toList();
   }
 
   List<AssociatedWork> getFilms(){
     return {
       AssociatedWork(
+        category: "Feature film",
         trailerId: "GkAUsuGMqm8",
           title: "Hrudayapoorvam",
           designation: "Associate Cameraman",
-          poster: "assets/posters/Hridayapoorvam.jpg",
+        poster: "https://img.youtube.com/vi/GkAUsuGMqm8/0.jpg",
+       //  poster: "assets/posters/hrudayapoorvam.webp",
           ),
       AssociatedWork(
+        category: "Feature film",
           trailerId: "ubVjt3eIDqA",
           title: "Padakkalam",
           designation: "Chief Associate Cameraman",
-          poster: "assets/posters/padakkalam.jpeg"),
+        // poster: "assets/posters/padakkalam.jpg"
+        poster: "https://img.youtube.com/vi/ubVjt3eIDqA/0.jpg",
+      ),
       AssociatedWork(
+          category: "Feature film",
           trailerId: "PGqltBCo6cU",
           title: "L2:Empuram",
           designation: "Associate Cameraman",
-          poster: "assets/posters/Empuraan_poster.jpg"),
+       //   poster: "assets/posters/empuran.jpg"
+        poster: "https://img.youtube.com/vi/PGqltBCo6cU/0.jpg",
+      ),
       AssociatedWork(
+          category: "Feature film",
           trailerId: "OCGGoT23kh4",
           title: "Kooman",
           designation: "Associate Cameraman",
-          poster: "assets/posters/Kooman_poster.jpg"),
+          poster: "https://img.youtube.com/vi/OCGGoT23kh4/0.jpg",
+        //  poster: "assets/posters/kooman.jpg"
+      ),
       AssociatedWork(
+          category: "Feature film",
           trailerId: "uUJtUYkBu-g",
           title: "Dhrishyam 2",
           designation: "Associate Cameraman",
-          poster: "assets/posters/drushyam_2_film_poster.jpg"),
+          poster: "https://img.youtube.com/vi/uUJtUYkBu-g/0.jpg",
+        //  poster: "assets/posters/drushyam_2_film_poster.jpg"
+      ),
       AssociatedWork(
+          category: "Feature film",
           trailerId: "L13AUL0HkDk",
           title: "Kurup",
           designation: "Associate Cameraman",
-          poster: "assets/posters/kurup.jpg"),
+          poster: "https://img.youtube.com/vi/L13AUL0HkDk/0.jpg",
+         // poster: "assets/posters/kurup.jpg"
+      ),
       AssociatedWork(
+          category: "Feature film",
           trailerId: "4DTsMtDcbNo",
           title: "Padayottam",
           designation: "Associate Cameraman",
-          poster: "assets/posters/padayottam.jpeg"),
+          poster: "https://img.youtube.com/vi/4DTsMtDcbNo/0.jpg",
+         // poster: "assets/posters/padayottam.jpg"
+      ),
       AssociatedWork(
+          category: "Feature film",
           trailerId: "8-vWm6cDnak",
           title: "Aadhi",
           designation: "Associate Cameraman",
-          poster: "assets/posters/aadhi.jpeg"),
+          poster: "https://img.youtube.com/vi/8-vWm6cDnak/0.jpg",
+        //  poster: "assets/posters/aadhi.jpg"
+      ),
       AssociatedWork(
+          category: "Feature film",
           trailerId: "f9ym_s-CEmI",
           title: "Tiyaan",
           designation: "Associate Cameraman",
-          poster: "assets/posters/Tiyaan_Movie_Poster.jpg"),
+          poster: "https://img.youtube.com/vi/f9ym_s-CEmI/0.jpg",
+        //  poster: "assets/posters/tiyan.jpg"
+      ),
       AssociatedWork(
+          category: "Feature film",
           trailerId: "cunn6W_9MM0",
           title: "Ore Mukham",
         designation: "Associate Cameraman",
-          poster: "assets/posters/oremukham.jpg",)
-    }.toList();
-  }
-
-  List<AssociatedWork> getWebSeries(){
-    return {
+          poster: "https://img.youtube.com/vi/cunn6W_9MM0/0.jpg",
+        //  poster: "assets/posters/oremukham.jpg"
+      ),
       AssociatedWork(
+          category: "Web series",
           trailerId: "QPuOLNzPR7k",
-        title: "Perilloor Premier League",
+          title: "Perilloor Premier League",
           designation: "Associate Cameraman",
-        poster: "assets/posters/periloor.jpg"),
+          poster: "https://img.youtube.com/vi/QPuOLNzPR7k/0.jpg",
+         // poster: "assets/posters/periloor.jpg"
+      )
     }.toList();
   }
 
   List<AssociatedWork> getCommercials(){
     return {
       AssociatedWork(
+          category: "Advertisement",
         trailerId: "l4KadPBOa98",
         title: "Athiran",
           designation: "Associate Cameraman",
         poster: "https://img.youtube.com/vi/l4KadPBOa98/0.jpg"),
       AssociatedWork(
+          category: "Advertisement",
           trailerId: "90RcJ0udpKc",
           title: "Athiran",
           designation: "Associate Cameraman",
           poster: "https://img.youtube.com/vi/90RcJ0udpKc/0.jpg"),
       AssociatedWork(
+          category: "Advertisement",
           trailerId: "HaXVOBi2Y30",
           title: "Athiran",
           designation: "Associate Cameraman",
           poster: "https://img.youtube.com/vi/HaXVOBi2Y30/0.jpg"),
       AssociatedWork(
+          category: "Advertisement",
           trailerId: "fFwOgt3YO1U",
           title: "Athiran",
           designation: "Associate Cameraman",
           poster: "https://img.youtube.com/vi/fFwOgt3YO1U/0.jpg"),
       AssociatedWork(
+          category: "Advertisement",
           trailerId: "DIALEvmlhDQ",
           title: "Athiran",
           designation: "Associate Cameraman",
           poster: "https://img.youtube.com/vi/DIALEvmlhDQ/0.jpg"),
       AssociatedWork(
+          category: "Advertisement",
           trailerId: "2A5Krtb310o",
           title: "Athiran",
           designation: "Associate Cameraman",
           poster: "https://img.youtube.com/vi/2A5Krtb310o/0.jpg"),
       AssociatedWork(
+          category: "Advertisement",
           trailerId: "pViKP5JnM2w",
           title: "Athiran",
           designation: "Associate Cameraman",
           poster: "https://img.youtube.com/vi/pViKP5JnM2w/0.jpg"),
       AssociatedWork(
+          category: "Advertisement",
           trailerId: "Ilrs-OWSpuY",
           title: "Athiran",
           designation: "Associate Cameraman",
