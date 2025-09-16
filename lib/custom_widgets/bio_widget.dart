@@ -136,71 +136,79 @@ class BioSection extends StatelessWidget {
   }
 
   Widget build(BuildContext context) {
-
     return LayoutBuilder(
       builder: (context, constraints) {
-        bool isWide = constraints.maxWidth > 800;
+        bool isWide = constraints.maxWidth > 900;
+        double leftRight = isWide ? constraints.maxWidth*0.15 :20;
+        // Responsive image size based on screen width
+        double imageHeight = isWide
+            ? constraints.maxWidth * 0.35 // e.g., 35% of width on wide screens
+            : constraints.maxWidth * 0.6; // 60% of width on small screens
+
+        // Put an upper and lower bound for better UX
+        imageHeight = imageHeight.clamp(200, 450); // min 200, max 450 px
 
         return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [Padding(
-            padding: EdgeInsets.all(isWide ? 100 : 20),
-            child: isWide
-                ? Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Left: Profile Image
-                Expanded(
-                  flex: 1,
-                  child: Image.asset(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: leftRight,right: leftRight),
+              child: isWide
+                  ? Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Left: Profile Image
+                  Expanded(
+                    flex: 1,
+                    child: Image.asset(
+                      "assets/images/profile_picture.png",
+                      fit: BoxFit.cover,
+                      // height: imageHeight,
+                    ),
+                  ),
+                  const SizedBox(width: 40),
+
+                  // Right: Bio + Contact + BottomImageCarousel
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _bioTextBlock(),
+                        _bioText1Block(),
+                        const SizedBox(height: 20),
+                        _bioDescription(),
+                        const SizedBox(height: 20),
+                        _divider(),
+                        const SizedBox(height: 20),
+                        _contactBlock(),
+                      ],
+                    ),
+                  ),
+                ],
+              )
+                  : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.asset(
                     "assets/images/profile_picture.png",
                     fit: BoxFit.cover,
-                    height: 400,
+                    width: double.infinity,
+                    height: imageHeight,
                   ),
-                ),
-                const SizedBox(width: 40),
-
-                // Right: Bio + Contact + BottomImageCarousel
-                Expanded(
-                  flex: 2,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _bioTextBlock(),
-                      _bioText1Block(),
-                      const SizedBox(height: 20),
-                      _bioDescription(),
-                      const SizedBox(height: 20),
-                      _divider(),
-                      const SizedBox(height: 20),
-                      _contactBlock(),
-                    ],
-                  ),
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  _bioTextBlock(),
+                  _bioText1Block(),
+                  const SizedBox(height: 10),
+                  _bioDescription(),
+                  const SizedBox(height: 20),
+                  _divider(),
+                  const SizedBox(height: 20),
+                  _contactBlock(),
+                ],
+              ),
             )
-                : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.asset(
-                  "assets/images/profile_picture.png",
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: 300,
-                ),
-                const SizedBox(height: 20),
-                _bioTextBlock(),
-                _bioText1Block(),
-                const SizedBox(height: 10),
-                _bioDescription(),
-                const SizedBox(height: 20),
-                _divider(),
-                const SizedBox(height: 20),
-                _contactBlock(),
-              ],
-            ),
-          )
-          ]
+          ],
         );
       },
     );

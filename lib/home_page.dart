@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:portfolio_website/repository/cinema_repo.dart';
+import 'package:portfolio_website/util_class.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'custom_widgets/associated_widget.dart';
 import 'custom_widgets/bio_widget.dart';
-import 'custom_widgets/feature_detailed.dart';
-import 'custom_widgets/feature_widget.dart';
-import 'custom_widgets/associated_details_page.dart';
+import 'custom_widgets/work_detail_widget.dart';
+import 'custom_widgets/work_item_listing_widget.dart';
 import 'custom_widgets/show_reel_widget.dart';
-import 'models/cinematograpghy_modals.dart';
+import 'models/cinematography_modals.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:html' as html;
 
@@ -21,21 +20,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   bool _isMenuOpen = false;
-  String _selectedPage = "Home";
-  String _subCategory = "Home";
-  String designation = "Director of photography";
+  String _selectedPage = Constants.HOME;
+  String _subCategory = Constants.HOME;
   late AnimationController _iconController;
   late CinemaRepository repo;
-  FeaturedWork? _selectedFilm;
-
-  final menuItems = [
-    "Commercial",
-    "Music video",
-    "Short film",
-    "Associated film",
-    "Associated commercial",
-    "About"
-  ];
+  WorkDataModel? _selectedFilm;
 
   @override
   void initState() {
@@ -48,24 +37,28 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
 
     // Restore state from URL on reload
-    final path = html.window.location.pathname ?? "/";
-    _restoreStateFromUrl(path);
+    // final path = html.window.location.pathname ?? "/";
+   // _restoreStateFromUrl(path);
 
     // Listen to browser back/forward
     html.window.onPopState.listen((event) {
+      if (_selectedPage == Constants.HOME) return;
       final path = html.window.location.pathname ?? "/";
-      _restoreStateFromUrl(path);
+      if (!(_selectedPage == Constants.HOME && path == "/")) {
+        _restoreStateFromUrl(path);
+      }
     });
   }
 
+
   void _restoreStateFromUrl(String path) {
     setState(() {
-      if (path == "/" || path == "/home") {
-        _selectedPage = "Home";
-        _subCategory = "Home";
+      if (path == "/" || path == Constants.PATH_HOME) {
+        _selectedPage = Constants.HOME;
+        _subCategory = Constants.HOME;
         _selectedFilm = null;
-      } else if (path.startsWith("/details")) {
-        _subCategory = "Details";
+      } else if (path.startsWith(Constants.PATH_DETAILS)) {
+        _subCategory = Constants.DETAILS;
       } else {
         final normalized = path.replaceAll("/", "").replaceAll("-", " ");
         _selectedPage = _capitalize(normalized);
@@ -103,14 +96,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       _selectedPage = page;
       _subCategory = _selectedPage;
     });
-
     html.window.history.pushState(null, page, '/${page.toLowerCase().replaceAll(" ", "-")}');
   }
 
   Widget _buildCustomHeader() {
     return LayoutBuilder(
       builder: (context, constraints) {
-         bool isMobile = constraints.maxWidth < 900;
+        bool isMobile = constraints.maxWidth < 800;
         double fontSize1 = isMobile ? 32 : 38;
         double fontSize2 = isMobile ? 22 : 24;
 
@@ -123,12 +115,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               children: [
                 GestureDetector(
                   onTap: () {
-                    setState(() {
-                      _selectedPage = "Home";
-                      _subCategory = "Home";
-                      _selectedFilm = null;
-                    });
-                    html.window.history.pushState(null, "Home", "/");
+                    if(_selectedPage == Constants.HOME){
+                      _navigateTo(Constants.ABOUT);
+                    }else{
+                      _navigateTo(Constants.HOME);
+                    }
                   },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -158,30 +149,26 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 if (!isMobile)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(menuItems.length * 2 - 1, (index) {
+                    children: List.generate(Constants.menuItems.length * 2 - 1, (index) {
                       if (index.isOdd) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            "/",
-                            style: GoogleFonts.alef(
-                              fontSize: 14,
-                              color: const Color.fromARGB(255, 44, 42, 42),
-                              fontWeight: FontWeight.w300,
-                            ),
+                          child: Icon(
+                            Icons.stop, // solid circle
+                            size: 6, // small size to look like a dot
+                            color: const Color.fromARGB(255, 44, 42, 42),
                           ),
                         );
                       } else {
-                        final item = menuItems[index ~/ 2];
+                        final item = Constants.menuItems[index ~/ 2];
                         return GestureDetector(
                           onTap: () => _navigateTo(item),
                           child: Text(
                             item,
                             style: GoogleFonts.alef(
                               fontSize: 14,
-                              fontWeight: _selectedPage == item
-                                  ? FontWeight.bold
-                                  : FontWeight.w400,
+                              fontWeight:
+                              _selectedPage == item ? FontWeight.bold : FontWeight.w400,
                               color: _selectedPage == item
                                   ? Colors.black
                                   : const Color.fromARGB(255, 44, 42, 42),
@@ -211,78 +198,74 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 900;
+    final isMobile = MediaQuery.of(context).size.width < 800;
     return WillPopScope(
-      onWillPop: () async {
-        if (_subCategory == "Details") {
-          setState(() {
-            _subCategory = _selectedPage;
-            _selectedFilm = null;
-          });
-          html.window.history.back();
-          return false;
-        }
-        if (_selectedPage != "Home") {
-          setState(() {
-            _selectedPage = "Home";
-            _subCategory = "Home";
-          });
-          html.window.history.back();
-          return false;
-        }
-        return true; // exit if on Home
-      },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _buildCustomHeader(),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      transitionBuilder: (child, animation) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: SizeTransition(
-                            sizeFactor: animation,
-                            child: child,
-                          ),
-                        );
-                      },
-                      child: (isMobile && _isMenuOpen)
-                          ? _buildMenuOverlay()
-                          : const SizedBox(),
-                    ),
-                    _buildMainContent(),
-                    const SizedBox(height: 40),
-                  ],
+        onWillPop: () async {
+          if (_selectedPage == Constants.HOME ) {
+            // Already on home → allow app exit
+            return true;
+          }
+          else {
+            // Go back in browser history, will trigger _restoreStateFromUrl
+           html.window.history.back();
+            return false;
+          }
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          body: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _buildCustomHeader(),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder: (child, animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: SizeTransition(
+                              sizeFactor: animation,
+                              child: child,
+                            ),
+                          );
+                        },
+                        child: (isMobile && _isMenuOpen)
+                            ? _buildMenuOverlay()
+                            : const SizedBox(),
+                      ),
+                      SizedBox(height: 30),
+                      _buildMainContent(),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            // ✅ This stays at the bottom
-            _buildFooter(),
-          ],
-        ),
-      )
+              _buildFooter(),
+            ],
+          ),
+        )
 
     );
   }
 
   Widget _buildMainContent() {
-    if (_subCategory == "Details") {
+    if (_subCategory == Constants.DETAILS) {
       if (_selectedFilm != null) {
-        if (_selectedFilm?.videoPaths.isEmpty == true) {
-          return AssociatedDetailScreen(film: _selectedFilm!, designation: designation);
-        }
-        return FeatureDetailedWidget(film: _selectedFilm!, designation: designation);
+        return WorkDetailWidget(film: _selectedFilm!);
       }
-      return const Center(child: Text("No film selected"));
+      return  Center(child:
+      Text("Page not available",
+          style: GoogleFonts.akatab(
+            color: const Color.fromARGB(255, 44, 42, 42),
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          )));
     }
+
     switch (_selectedPage) {
-      case "Home":
+      case Constants.HOME:
         return ShowReelWidget(
           films: repo.getHomeData(),
           onCardTap: (category) {
@@ -293,109 +276,68 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             html.window.history.pushState(null, category, '/${category.toLowerCase().replaceAll(" ", "-")}');
           },
         );
-      case "Details":
-        if (_selectedFilm?.videoPaths.isEmpty == true) {
-          return AssociatedDetailScreen(film: _selectedFilm!, designation: designation);
-        }
-        return FeatureDetailedWidget(film: _selectedFilm!, designation: designation);
-      case "About":
+      case Constants.ABOUT:{
         return BioSection();
-      case "Commercial":
-        final List<FeaturedWork> works = repo.getFeatureWork("Commercial");
-        return FeaturedWorkGrid(
+      }
+      case Constants.COMMERCIAL:{
+        final List<WorkDataModel> works = repo.getFeatureWork(Constants.COMMERCIAL);
+        return WorkListingGridWidget(
           films: works,
           onTrailerTap: (film) {
             setState(() {
-              _subCategory = "Details";
+              _subCategory = Constants.DETAILS;
               _selectedFilm = film;
             });
-            html.window.history.pushState(null, "Details", "/details");
+            html.window.history.pushState(null, Constants.DETAILS, Constants.PATH_DETAILS);
           },
         );
-      case "Music video":
-        final List<FeaturedWork> works = repo.getFeatureWork("Music video");
-        return FeaturedWorkGrid(
+      }
+      case Constants.MUSIC_VIDEO:
+        final List<WorkDataModel> works = repo.getFeatureWork(Constants.MUSIC_VIDEO);
+        return WorkListingGridWidget(
           films: works,
           onTrailerTap: (film) {
             setState(() {
-              _subCategory = "Details";
+              _subCategory = Constants.DETAILS;
               _selectedFilm = film;
             });
-            html.window.history.pushState(null, "Details", "/details");
+            html.window.history.pushState(null, Constants.DETAILS, Constants.PATH_DETAILS);
           },
         );
-      case "Short film":
-        final List<FeaturedWork> works = repo.getFeatureWork("Short film");
-        return FeaturedWorkGrid(
+      case Constants.SHORT_FILM:
+        final List<WorkDataModel> works = repo.getFeatureWork(Constants.SHORT_FILM);
+        return WorkListingGridWidget(
           films: works,
           onTrailerTap: (film) {
             setState(() {
-              _subCategory = "Details";
+              _subCategory = Constants.DETAILS;
               _selectedFilm = film;
             });
-            html.window.history.pushState(null, "Details", "/details");
+            html.window.history.pushState(null, Constants.DETAILS, Constants.PATH_DETAILS);
           },
         );
-      case "Associated film":
-        final List<AssociatedWork> works = repo.getFilms();
-        return AssociatedWidget(
+      case Constants.ASSOCIATED_FILM:
+        final List<WorkDataModel> works = repo.getFilms();
+        return WorkListingGridWidget(
           films: works,
           onTrailerTap: (film) {
             setState(() {
-              _subCategory = "Details";
-              _selectedFilm = FeaturedWork(
-                trailerId: film.trailerId,
-                yearOfRelease: "",
-                description: "",
-                videoPaths: [],
-                poster: film.poster,
-                filmName: film.title,
-                credit: Credit(
-                  director: "",
-                  screenplay: "",
-                  editor: "",
-                  art_director: "",
-                  sync_sound: "",
-                  music: "",
-                  production: "",
-                  di: "",
-                ),
-                category: film.category,
-              );
-              designation = film.designation;
+              _subCategory = Constants.DETAILS;
+              _selectedFilm = film;
             });
-            html.window.history.pushState(null, "Details", "/details");
+            html.window.history.pushState(null, Constants.DETAILS, Constants.PATH_DETAILS);
           },
         );
-      case "Associated commercial":
-        final List<AssociatedWork> works = repo.getCommercials();
-        return AssociatedWidget(
+      case Constants.ASSOCIATED_COMMERCIAL:
+        final List<WorkDataModel> works = repo.getCommercials();
+        return WorkListingGridWidget(
           films: works,
           onTrailerTap: (film) {
             setState(() {
-              _subCategory = "Details";
-              _selectedFilm = FeaturedWork(
-                trailerId: film.trailerId,
-                yearOfRelease: "",
-                description: "",
-                videoPaths: [],
-                poster: film.poster,
-                filmName: film.title,
-                credit: Credit(
-                  director: "",
-                  screenplay: "",
-                  editor: "",
-                  art_director: "",
-                  sync_sound: "",
-                  music: "",
-                  production: "",
-                  di: "",
-                ),
-                category: film.category,
-              );
-              designation = film.designation;
+              _subCategory = Constants.DETAILS;
+              _selectedFilm = film;
             });
-            html.window.history.pushState(null, "Details", "/details");
+            html.window.history.pushState(null, Constants.DETAILS, Constants.PATH_DETAILS);
           },
         );
       default:
@@ -410,7 +352,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: menuItems.map((e) => _menuItem(e)).toList(),
+        children: Constants.menuItems.map((e) => _menuItem(e)).toList(),
       ),
     );
   }
@@ -425,13 +367,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             Text(
               text,
               style: GoogleFonts.akatab(
-                color: const Color.fromARGB(255, 44, 42, 42),
+                color: Color.fromARGB(255, 44, 42, 42),
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
               ),
             ),
             const SizedBox(height: 5),
-            if (text != "About")
+            if (text != Constants.ABOUT)
               const Divider(
                 color: Color.fromARGB(255, 44, 42, 42),
                 thickness: 1,
@@ -447,7 +389,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget _buildPlaceholderPage(String page) {
     return Center(
       child: Text(
-        "$page Page (Coming Soon)",
+        "Something went wrong!",
         style: const TextStyle(fontSize: 20, color: Colors.grey),
       ),
     );
@@ -481,18 +423,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     mainAxisAlignment: MainAxisAlignment.center,
     children: [
       _socialIcon(FontAwesomeIcons.instagram,
-          "https://www.instagram.com/naveenchempodi?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="),
-      const SizedBox(width: 15),
-      _socialIcon(FontAwesomeIcons.linkedin,
-          "https://www.linkedin.com/in/naveen-chempodi-5482a224a/"),
+          Constants.INSTAGRAM_LINK),
       const SizedBox(width: 15),
       _socialIcon(FontAwesomeIcons.imdb,
-          "https://www.imdb.com/name/nm11117697/?ref_=nv_sr_srsg_0_tt_0_nm_1_in_0_q_naveen%2520chempodi"),
+          Constants.IMDB_LINK),
       const SizedBox(width: 15),
       _socialIcon(FontAwesomeIcons.link,
-          "https://linktr.ee/naveen_chempodi?utm_source=linktree_profile_share"),
-      const SizedBox(width: 15),
-      _socialIcon(FontAwesomeIcons.facebook, "https://..."),
+          Constants.LISK_TREE_LINK),
     ],
   );
 
