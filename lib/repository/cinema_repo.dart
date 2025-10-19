@@ -180,7 +180,7 @@ class CinemaRepository{
           designation2:"",
           category: "Short film",
           poster: "https://img.youtube.com/vi/FvdGBOpMSlU/0.jpg",
-          videoPath: "assets/videos/for_alice01.mp4"),
+          videoPath: ""),
       WorkDataModel(trailerId: "FWg1O5byix4",
           title: "CID moosa",
           director: "",
