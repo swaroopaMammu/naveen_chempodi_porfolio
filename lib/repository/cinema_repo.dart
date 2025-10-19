@@ -84,7 +84,7 @@ class CinemaRepository{
           client:"Bedtime stories",
           category: "Short film",
           poster: "",
-          videoPath: "assets/videos/for_alice01.mp4"),
+          videoPath: ""),
       WorkDataModel(trailerId: "FWg1O5byix4",
           title: "CID moosa",
           client:"Boldova Productions",

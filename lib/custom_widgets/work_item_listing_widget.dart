@@ -79,8 +79,9 @@ class _WorkListingGridWidgetState extends State<WorkListingGridWidget> {
                       ),
                       textAlign: TextAlign.center,
                     ),
+                    if(film.designation2.isNotEmpty)
                     Text(
-                      isAssociated? film.designation2 :film.category,
+                      film.designation2,
                       style: GoogleFonts.akatab(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
