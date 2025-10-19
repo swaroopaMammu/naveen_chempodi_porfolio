@@ -47,7 +47,7 @@ class _WorkListingGridWidgetState extends State<WorkListingGridWidget> {
               itemCount: widget.films.length,
               itemBuilder: (context, index) {
                 final film = widget.films[index];
-                final isAssociated = film.designation != "Director of photography";
+                final isAssociated = film.designation1 != "Director of photography";
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -71,7 +71,16 @@ class _WorkListingGridWidgetState extends State<WorkListingGridWidget> {
                       textAlign: TextAlign.center,
                     ),
                     Text(
-                      isAssociated? film.designation :film.category,
+                      isAssociated? film.designation1 :film.category,
+                      style: GoogleFonts.akatab(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.grey,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      isAssociated? film.designation2 :film.category,
                       style: GoogleFonts.akatab(
                         fontSize: 14,
                         fontWeight: FontWeight.w400,

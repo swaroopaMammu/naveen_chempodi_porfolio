@@ -42,7 +42,7 @@ class _FeatureDetailedState extends State<WorkDetailWidget> {
         _buildDetailItem("Director", widget.film.director),
         if(widget.film.client.isNotEmpty)
         _buildDetailItem("Production/Client", widget.film.client),
-        _buildDetailItem(widget.film.designation, "Naveen Chempodi" ),
+        _buildDetailItem(widget.film.designation1, "Naveen Chempodi" ),
       ],
     );
   }
